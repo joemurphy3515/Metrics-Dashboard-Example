@@ -576,8 +576,8 @@ function App() {
                   value={`${currentStats.textOnly.toFixed(1)}%`}
                   trend={getMoM("textOnly")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="EMAIL ONLY %"
@@ -585,8 +585,8 @@ function App() {
                   value={`${currentStats.emailOnly.toFixed(1)}%`}
                   trend={getMoM("emailOnly")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="EMAIL & TEXT %"
@@ -594,8 +594,8 @@ function App() {
                   value={`${currentStats.both.toFixed(1)}%`}
                   trend={getMoM("both")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="DX PLATFORMS"
@@ -603,8 +603,8 @@ function App() {
                   value={`${currentStats.dx.toFixed(1)}%`}
                   trend={getMoM("dx")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="CX PLATFORMS"
@@ -612,8 +612,8 @@ function App() {
                   value={`${currentStats.cx.toFixed(1)}%`}
                   trend={getMoM("cx")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="FORDPASS ONLY"
@@ -621,8 +621,8 @@ function App() {
                   value={`${currentStats.fp.toFixed(1)}%`}
                   trend={getMoM("fp")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="OWNER WEB ONLY"
@@ -630,8 +630,8 @@ function App() {
                   value={`${currentStats.ow.toFixed(1)}%`}
                   trend={getMoM("ow")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
                 <MetricCard
                   title="TIER3 ONLY"
@@ -639,8 +639,8 @@ function App() {
                   value={`${currentStats.t3.toFixed(1)}%`}
                   trend={getMoM("t3")}
                   icon={<FaPercentage />}
-                  color="#F0FDF4"
-                  iconColor="#166534"
+                  color="#F0F1F5"
+                  iconColor="#919398"
                 />
               </div>
             )}
