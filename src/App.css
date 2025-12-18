@@ -232,6 +232,52 @@
   align-self: center;
 }
 
+.mom-controls {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.compare-inputs {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.month-select-inline {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.metric-trend {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-trend.positive {
+  color: #166534;
+}
+
+.metric-trend.negative {
+  color: #991b1b;
+}
+
 @media (max-width: 1400px) {
   .metrics-grid {
     grid-template-columns: repeat(3, 1fr);

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useMemo } from "react";
 import { FaCar, FaChevronDown, FaChevronRight } from "react-icons/fa6";
+import { LuGitCompareArrows } from "react-icons/lu";
 import { FaPercentage } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
@@ -27,6 +28,7 @@ interface MetricProps {
   icon: React.ReactNode;
   color: string;
   iconColor: string;
+  trend?: { value: string; isPositive: boolean };
 }
 
 const MetricCard = ({
@@ -36,6 +38,7 @@ const MetricCard = ({
   icon,
   color,
   iconColor,
+  trend,
 }: MetricProps) => (
   <div className="metric-card">
     <div className="metric-header">
@@ -51,6 +54,13 @@ const MetricCard = ({
       </div>
     </div>
     <div className="metric-value">{value}</div>
+    {trend && (
+      <div
+        className={`metric-trend ${trend.isPositive ? "positive" : "negative"}`}
+      >
+        {trend.isPositive ? "▲" : "▼"} {trend.value}
+      </div>
+    )}
   </div>
 );
 
@@ -61,8 +71,11 @@ function App() {
     metrics: true,
     totals: true,
     percentages: true,
-    monthOverMonth: true
+    monthOverMonth: true,
   });
+
+  const [comparisonMonth, setComparisonMonth] = useState("");
+  const [showComparison, setShowComparison] = useState(false);
 
   const toggleSection = (section: keyof typeof sectionsOpen) => {
     setSectionsOpen((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -97,6 +110,71 @@ function App() {
     Record<string, DashboardCounts>
   >({});
   const [selectedMonth, setSelectedMonth] = useState<string>(months[0]);
+
+  const getPercentagesForMonth = (monthName: string) => {
+    const data = allMonthlyData[monthName] || {};
+    const sources = ["Dealer Web", "FordPass", "Owner Web", "Tier3"];
+    const n = (s: string, t: string) => data[`${s}-${t}`] || 0;
+
+    const textOnly = sources.reduce((acc, s) => acc + n(s, "Text Only"), 0);
+    const emailOnly = sources.reduce((acc, s) => acc + n(s, "Email Only"), 0);
+    const both = sources.reduce((acc, s) => acc + n(s, "Email & Text"), 0);
+    const totalOptIns = textOnly + emailOnly + both;
+
+    const getPlatformOptIns = (s: string) =>
+      n(s, "Text Only") + n(s, "Email Only") + n(s, "Email & Text");
+
+    return {
+      totalOptIns,
+      textOnly: totalOptIns ? (textOnly / totalOptIns) * 100 : 0,
+      emailOnly: totalOptIns ? (emailOnly / totalOptIns) * 100 : 0,
+      both: totalOptIns ? (both / totalOptIns) * 100 : 0,
+      dx: totalOptIns
+        ? (getPlatformOptIns("Dealer Web") / totalOptIns) * 100
+        : 0,
+      cx: totalOptIns
+        ? ((getPlatformOptIns("FordPass") +
+            getPlatformOptIns("Owner Web") +
+            getPlatformOptIns("Tier3")) /
+            totalOptIns) *
+          100
+        : 0,
+      fp: totalOptIns ? (getPlatformOptIns("FordPass") / totalOptIns) * 100 : 0,
+      ow: totalOptIns
+        ? (getPlatformOptIns("Owner Web") / totalOptIns) * 100
+        : 0,
+      t3: totalOptIns ? (getPlatformOptIns("Tier3") / totalOptIns) * 100 : 0,
+    };
+  };
+
+  const currentStats = useMemo(
+    () => getPercentagesForMonth(selectedMonth),
+    [allMonthlyData, selectedMonth]
+  );
+  const compareStats = useMemo(
+    () => getPercentagesForMonth(comparisonMonth),
+    [allMonthlyData, comparisonMonth]
+  );
+
+  const handleCompareClick = () => {
+    if (!allMonthlyData[selectedMonth] || !allMonthlyData[comparisonMonth]) {
+      alert(
+        "Ensure data is uploaded for BOTH selected months before comparing."
+      );
+      return;
+    }
+    setShowComparison(true);
+  };
+
+  const getMoM = (key: keyof typeof currentStats) => {
+    const current = currentStats[key] as number;
+    const previous = compareStats[key] as number;
+    const diff = current - previous;
+    return {
+      value: `${Math.abs(diff).toFixed(1)}%`,
+      isPositive: diff >= 0,
+    };
+  };
 
   const stats = useMemo(() => {
     const data = allMonthlyData[selectedMonth] || {};
@@ -457,9 +535,118 @@ function App() {
             )}
           </h3>
         </div>
-      </section>
 
-      
+        {sectionsOpen.monthOverMonth && (
+          <div className="mom-controls">
+            <div className="compare-inputs">
+              <span>
+                Compare <strong>{selectedMonth}</strong> vs{" "}
+              </span>
+              <select
+                className="month-select-inline"
+                value={comparisonMonth}
+                onChange={(e) => {
+                  setComparisonMonth(e.target.value);
+                  setShowComparison(false);
+                }}
+              >
+                <option value="">Select Month...</option>
+                {months.map(
+                  (m) =>
+                    m !== selectedMonth && (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    )
+                )}
+              </select>
+              <button
+                className="btn-primary btn-sm"
+                onClick={handleCompareClick}
+              >
+                <LuGitCompareArrows /> Compare
+              </button>
+            </div>
+
+            {showComparison && (
+              <div className="metrics-grid" style={{ marginTop: "20px" }}>
+                <MetricCard
+                  title="TEXT ONLY %"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.textOnly.toFixed(1)}%`}
+                  trend={getMoM("textOnly")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="EMAIL ONLY %"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.emailOnly.toFixed(1)}%`}
+                  trend={getMoM("emailOnly")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="EMAIL & TEXT %"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.both.toFixed(1)}%`}
+                  trend={getMoM("both")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="DX PLATFORMS"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.dx.toFixed(1)}%`}
+                  trend={getMoM("dx")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="CX PLATFORMS"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.cx.toFixed(1)}%`}
+                  trend={getMoM("cx")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="FORDPASS ONLY"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.fp.toFixed(1)}%`}
+                  trend={getMoM("fp")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="OWNER WEB ONLY"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.ow.toFixed(1)}%`}
+                  trend={getMoM("ow")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+                <MetricCard
+                  title="TIER3 ONLY"
+                  subtitle="MoM Variance"
+                  value={`${currentStats.t3.toFixed(1)}%`}
+                  trend={getMoM("t3")}
+                  icon={<FaPercentage />}
+                  color="#F0FDF4"
+                  iconColor="#166534"
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
