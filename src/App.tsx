@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo } from "react";
-import { FaCar } from "react-icons/fa6";
+import { FaCar, FaChevronDown, FaChevronRight } from "react-icons/fa6";
 import { FaPercentage } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
@@ -56,6 +56,16 @@ const MetricCard = ({
 
 function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [sectionsOpen, setSectionsOpen] = useState({
+    metrics: true,
+    totals: true,
+    percentages: true,
+  });
+
+  const toggleSection = (section: keyof typeof sectionsOpen) => {
+    setSectionsOpen((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
 
   const months = useMemo(() => {
     const list = [];
@@ -239,143 +249,194 @@ function App() {
 
       <hr className="divider" />
 
+      {/* KEY METRICS SECTION */}
       <section className="metrics-section">
-        <h3 className="section-label">Key Metrics</h3>
-        <div className="metrics-grid">
-          {["Text Only", "Email Only", "Email & Text", "No Comms"].map((type) =>
-            ["Dealer Web", "FordPass", "Owner Web", "Tier3"].map((source) => (
-              <MetricCard
-                key={`${source}-${type}`}
-                title={`Source - ${source}`}
-                subtitle={type}
-                value={getVal(source, type)}
-                icon={<FaCar />}
-                color="#e5eafbff"
-                iconColor="#3b82f6"
-              />
-            ))
-          )}
+        <div
+          className="section-header-clickable"
+          onClick={() => toggleSection("metrics")}
+        >
+          <h3 className="section-label">
+            Key Metrics
+            {sectionsOpen.metrics ? (
+              <FaChevronDown className="chevron" />
+            ) : (
+              <FaChevronRight className="chevron" />
+            )}
+          </h3>
         </div>
+
+        {sectionsOpen.metrics && (
+          <div className="metrics-grid">
+            {["Text Only", "Email Only", "Email & Text", "No Comms"].map(
+              (type) =>
+                ["Dealer Web", "FordPass", "Owner Web", "Tier3"].map(
+                  (source) => (
+                    <MetricCard
+                      key={`${source}-${type}`}
+                      title={`Source - ${source}`}
+                      subtitle={type}
+                      value={getVal(source, type)}
+                      icon={<FaCar />}
+                      color="#e5eafbff"
+                      iconColor="#3b82f6"
+                    />
+                  )
+                )
+            )}
+          </div>
+        )}
       </section>
 
       <hr className="divider" />
 
+      {/* TOTALS SECTION */}
       <section className="metrics-section">
-        <h3 className="section-label">Totals</h3>
-        <div className="metrics-grid totals-grid">
-          <MetricCard
-            title="TEXT ONLY"
-            subtitle="All Sources"
-            value={stats.totals.textOnly}
-            icon={<MdTextsms />}
-            color="#E1F9F7"
-            iconColor="#00A19D"
-          />
-          <MetricCard
-            title="EMAIL ONLY"
-            subtitle="All Sources"
-            value={stats.totals.emailOnly}
-            icon={<MdAlternateEmail />}
-            color="#E1F9F7"
-            iconColor="#00A19D"
-          />
-          <MetricCard
-            title="EMAIL & TEXT"
-            subtitle="All Sources"
-            value={stats.totals.both}
-            icon={<TbArrowBarBoth />}
-            color="#E1F9F7"
-            iconColor="#00A19D"
-          />
-          <MetricCard
-            title="NO COMMS"
-            subtitle="All Sources"
-            value={stats.totals.noComms}
-            icon={<RxValueNone />}
-            color="#E1F9F7"
-            iconColor="#00A19D"
-          />
-          <MetricCard
-            title="TOTAL OPT-INS"
-            subtitle="Combined Sources"
-            value={stats.totals.totalOptIns}
-            icon={<MdAddCircle />}
-            color="#E1F9F7"
-            iconColor="#00A19D"
-          />
+        <div
+          className="section-header-clickable"
+          onClick={() => toggleSection("totals")}
+        >
+          <h3 className="section-label">
+            Totals
+            {sectionsOpen.totals ? (
+              <FaChevronDown className="chevron" />
+            ) : (
+              <FaChevronRight className="chevron" />
+            )}
+          </h3>
         </div>
+
+        {sectionsOpen.totals && (
+          <div className="metrics-grid totals-grid">
+            <MetricCard
+              title="TEXT ONLY"
+              subtitle="All Sources"
+              value={stats.totals.textOnly}
+              icon={<MdTextsms />}
+              color="#E1F9F7"
+              iconColor="#00A19D"
+            />
+            <MetricCard
+              title="EMAIL ONLY"
+              subtitle="All Sources"
+              value={stats.totals.emailOnly}
+              icon={<MdAlternateEmail />}
+              color="#E1F9F7"
+              iconColor="#00A19D"
+            />
+            <MetricCard
+              title="EMAIL & TEXT"
+              subtitle="All Sources"
+              value={stats.totals.both}
+              icon={<TbArrowBarBoth />}
+              color="#E1F9F7"
+              iconColor="#00A19D"
+            />
+            <MetricCard
+              title="NO COMMS"
+              subtitle="All Sources"
+              value={stats.totals.noComms}
+              icon={<RxValueNone />}
+              color="#E1F9F7"
+              iconColor="#00A19D"
+            />
+            <MetricCard
+              title="TOTAL OPT-INS"
+              subtitle="Combined Sources"
+              value={stats.totals.totalOptIns}
+              icon={<MdAddCircle />}
+              color="#E1F9F7"
+              iconColor="#00A19D"
+            />
+          </div>
+        )}
       </section>
 
       <hr className="divider" />
 
+      {/* PERCENTAGES SECTION */}
       <section className="metrics-section">
-        <h3 className="section-label">Opt-In Percentages</h3>
-        <div className="metrics-grid">
-          <MetricCard
-            title="TEXT ONLY %"
-            subtitle="of Total Opt-ins"
-            value={stats.percentages.textOnly}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="EMAIL ONLY %"
-            subtitle="of Total Opt-ins"
-            value={stats.percentages.emailOnly}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="EMAIL & TEXT %"
-            subtitle="of Total Opt-ins"
-            value={stats.percentages.both}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="DX PLATFORMS"
-            subtitle="Dealer Web Dist."
-            value={stats.percentages.dx}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="CX PLATFORMS"
-            subtitle="Consumer Dist."
-            value={stats.percentages.cx}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="FORDPASS ONLY"
-            subtitle="Platform Dist."
-            value={stats.percentages.fp}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="OWNER WEB ONLY"
-            subtitle="Platform Dist."
-            value={stats.percentages.ow}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
-          <MetricCard
-            title="TIER3 ONLY"
-            subtitle="Platform Dist."
-            value={stats.percentages.t3}
-            icon={<FaPercentage />}
-            color="#EAE1F9"
-            iconColor="#7D35EF"
-          />
+        <div
+          className="section-header-clickable"
+          onClick={() => toggleSection("percentages")}
+        >
+          <h3 className="section-label">
+            Opt-In Percentages
+            {sectionsOpen.percentages ? (
+              <FaChevronDown className="chevron" />
+            ) : (
+              <FaChevronRight className="chevron" />
+            )}
+          </h3>
         </div>
+
+        {sectionsOpen.percentages && (
+          <div className="metrics-grid">
+            <MetricCard
+              title="TEXT ONLY %"
+              subtitle="of Total Opt-ins"
+              value={stats.percentages.textOnly}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="EMAIL ONLY %"
+              subtitle="of Total Opt-ins"
+              value={stats.percentages.emailOnly}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="EMAIL & TEXT %"
+              subtitle="of Total Opt-ins"
+              value={stats.percentages.both}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="DX PLATFORMS"
+              subtitle="Dealer Web Dist."
+              value={stats.percentages.dx}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="CX PLATFORMS"
+              subtitle="Consumer Dist."
+              value={stats.percentages.cx}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="FORDPASS ONLY"
+              subtitle="Platform Dist."
+              value={stats.percentages.fp}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="OWNER WEB ONLY"
+              subtitle="Platform Dist."
+              value={stats.percentages.ow}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+            <MetricCard
+              title="TIER3 ONLY"
+              subtitle="Platform Dist."
+              value={stats.percentages.t3}
+              icon={<FaPercentage />}
+              color="#EAE1F9"
+              iconColor="#7D35EF"
+            />
+          </div>
+        )}
       </section>
     </div>
   );
