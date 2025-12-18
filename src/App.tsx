@@ -1,10 +1,15 @@
 import React, { useRef, useState, useMemo } from "react";
 import { FaCar } from "react-icons/fa6";
+import { FaPercentage } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
 import { GrPowerReset } from "react-icons/gr";
-import { MdCalendarMonth } from "react-icons/md";
-import { MdAlternateEmail, MdTextsms, MdAddCircle } from "react-icons/md";
+import {
+  MdCalendarMonth,
+  MdAlternateEmail,
+  MdTextsms,
+  MdAddCircle,
+} from "react-icons/md";
 import { TbArrowBarBoth } from "react-icons/tb";
 import { RxValueNone } from "react-icons/rx";
 
@@ -81,32 +86,50 @@ function App() {
   >({});
   const [selectedMonth, setSelectedMonth] = useState<string>(months[0]);
 
-  const totals = useMemo(() => {
-    const currentData = allMonthlyData[selectedMonth] || {};
+  const stats = useMemo(() => {
+    const data = allMonthlyData[selectedMonth] || {};
     const sources = ["Dealer Web", "FordPass", "Owner Web", "Tier3"];
 
-    let textOnly = 0;
-    let emailOnly = 0;
-    let both = 0;
-    let noComms = 0;
+    const n = (s: string, t: string) => data[`${s}-${t}`] || 0;
 
-    sources.forEach((source) => {
-      textOnly += currentData[`${source}-Text Only`] || 0;
-      emailOnly += currentData[`${source}-Email Only`] || 0;
-      both += currentData[`${source}-Email & Text`] || 0;
-      noComms += currentData[`${source}-No Comms`] || 0;
-    });
+    const textOnly = sources.reduce((acc, s) => acc + n(s, "Text Only"), 0);
+    const emailOnly = sources.reduce((acc, s) => acc + n(s, "Email Only"), 0);
+    const both = sources.reduce((acc, s) => acc + n(s, "Email & Text"), 0);
+    const noComms = sources.reduce((acc, s) => acc + n(s, "No Comms"), 0);
+    const totalOptIns = textOnly + emailOnly + both;
 
-    const hasData = Object.keys(currentData).length > 0;
+    const getPlatformOptIns = (s: string) =>
+      n(s, "Text Only") + n(s, "Email Only") + n(s, "Email & Text");
+
+    const dxOptIns = getPlatformOptIns("Dealer Web");
+    const fpOptIns = getPlatformOptIns("FordPass");
+    const owOptIns = getPlatformOptIns("Owner Web");
+    const t3OptIns = getPlatformOptIns("Tier3");
+    const cxOptIns = fpOptIns + owOptIns + t3OptIns;
+
+    const hasData = Object.keys(data).length > 0 && totalOptIns > 0;
+
+    const fmtPct = (val: number) =>
+      hasData ? `${((val / totalOptIns) * 100).toFixed(1)}%` : "xxxx";
 
     return {
-      textOnly: hasData ? textOnly.toLocaleString() : "xxxx",
-      emailOnly: hasData ? emailOnly.toLocaleString() : "xxxx",
-      both: hasData ? both.toLocaleString() : "xxxx",
-      noComms: hasData ? noComms.toLocaleString() : "xxxx",
-      totalOptIns: hasData
-        ? (textOnly + emailOnly + both).toLocaleString()
-        : "xxxx",
+      totals: {
+        textOnly: hasData ? textOnly.toLocaleString() : "xxxx",
+        emailOnly: hasData ? emailOnly.toLocaleString() : "xxxx",
+        both: hasData ? both.toLocaleString() : "xxxx",
+        noComms: hasData ? noComms.toLocaleString() : "xxxx",
+        totalOptIns: hasData ? totalOptIns.toLocaleString() : "xxxx",
+      },
+      percentages: {
+        textOnly: fmtPct(textOnly),
+        emailOnly: fmtPct(emailOnly),
+        both: fmtPct(both),
+        dx: fmtPct(dxOptIns),
+        cx: fmtPct(cxOptIns),
+        fp: fmtPct(fpOptIns),
+        ow: fmtPct(owOptIns),
+        t3: fmtPct(t3OptIns),
+      },
     };
   }, [allMonthlyData, selectedMonth]);
 
@@ -122,105 +145,20 @@ function App() {
         setAllMonthlyData((prev) => ({ ...prev, [selectedMonth]: result }));
         if (fileInputRef.current) fileInputRef.current.value = "";
       } catch (err) {
-        console.error("Failed to parse CSV", err);
+        console.error(err);
       }
     }
   };
 
   const handleResetAll = () => {
-    if (window.confirm("This will clear data for ALL months. Continue?")) {
+    if (window.confirm("This will clear data for ALL months. Continue?"))
       setAllMonthlyData({});
-    }
   };
 
   const getVal = (source: string, type: string) => {
-    const currentMonthData = allMonthlyData[selectedMonth] || {};
-    const key = `${source}-${type}`;
-    return currentMonthData[key]?.toLocaleString() || "xxxx";
+    const currentData = allMonthlyData[selectedMonth] || {};
+    return currentData[`${source}-${type}`]?.toLocaleString() || "xxxx";
   };
-
-  const metrics = [
-    {
-      title: "Source - Dealer Web",
-      subtitle: "Text Only",
-      value: getVal("Dealer Web", "Text Only"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "Text Only",
-      value: getVal("FordPass", "Text Only"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "Text Only",
-      value: getVal("Owner Web", "Text Only"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "Text Only",
-      value: getVal("Tier3", "Text Only"),
-    },
-    {
-      title: "Source - Dealer Web",
-      subtitle: "Email Only",
-      value: getVal("Dealer Web", "Email Only"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "Email Only",
-      value: getVal("FordPass", "Email Only"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "Email Only",
-      value: getVal("Owner Web", "Email Only"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "Email Only",
-      value: getVal("Tier3", "Email Only"),
-    },
-    {
-      title: "Source - Dealer Web",
-      subtitle: "Email & Text",
-      value: getVal("Dealer Web", "Email & Text"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "Email & Text",
-      value: getVal("FordPass", "Email & Text"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "Email & Text",
-      value: getVal("Owner Web", "Email & Text"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "Email & Text",
-      value: getVal("Tier3", "Email & Text"),
-    },
-    {
-      title: "Source - Dealer Web",
-      subtitle: "No Comms",
-      value: getVal("Dealer Web", "No Comms"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "No Comms",
-      value: getVal("FordPass", "No Comms"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "No Comms",
-      value: getVal("Owner Web", "No Comms"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "No Comms",
-      value: getVal("Tier3", "No Comms"),
-    },
-  ];
 
   return (
     <div className="dashboard-container">
@@ -277,17 +215,19 @@ function App() {
       <section className="metrics-section">
         <h3 className="section-label">Key Metrics</h3>
         <div className="metrics-grid">
-          {metrics.map((m, i) => (
-            <MetricCard
-              key={i}
-              title={m.title}
-              subtitle={m.subtitle}
-              value={m.value}
-              icon={<FaCar />}
-              color="#e5eafbff"
-              iconColor="#3b82f6"
-            />
-          ))}
+          {["Text Only", "Email Only", "Email & Text", "No Comms"].map((type) =>
+            ["Dealer Web", "FordPass", "Owner Web", "Tier3"].map((source) => (
+              <MetricCard
+                key={`${source}-${type}`}
+                title={`Source - ${source}`}
+                subtitle={type}
+                value={getVal(source, type)}
+                icon={<FaCar />}
+                color="#e5eafbff"
+                iconColor="#3b82f6"
+              />
+            ))
+          )}
         </div>
       </section>
 
@@ -299,7 +239,7 @@ function App() {
           <MetricCard
             title="TEXT ONLY"
             subtitle="All Sources"
-            value={totals.textOnly}
+            value={stats.totals.textOnly}
             icon={<MdTextsms />}
             color="#E1F9F7"
             iconColor="#00A19D"
@@ -307,7 +247,7 @@ function App() {
           <MetricCard
             title="EMAIL ONLY"
             subtitle="All Sources"
-            value={totals.emailOnly}
+            value={stats.totals.emailOnly}
             icon={<MdAlternateEmail />}
             color="#E1F9F7"
             iconColor="#00A19D"
@@ -315,7 +255,7 @@ function App() {
           <MetricCard
             title="EMAIL & TEXT"
             subtitle="All Sources"
-            value={totals.both}
+            value={stats.totals.both}
             icon={<TbArrowBarBoth />}
             color="#E1F9F7"
             iconColor="#00A19D"
@@ -323,7 +263,7 @@ function App() {
           <MetricCard
             title="NO COMMS"
             subtitle="All Sources"
-            value={totals.noComms}
+            value={stats.totals.noComms}
             icon={<RxValueNone />}
             color="#E1F9F7"
             iconColor="#00A19D"
@@ -331,7 +271,7 @@ function App() {
           <MetricCard
             title="TOTAL OPT-INS"
             subtitle="Combined Sources"
-            value={totals.totalOptIns}
+            value={stats.totals.totalOptIns}
             icon={<MdAddCircle />}
             color="#E1F9F7"
             iconColor="#00A19D"
@@ -340,6 +280,76 @@ function App() {
       </section>
 
       <hr className="divider" />
+
+      <section className="metrics-section">
+        <h3 className="section-label">Opt-In Percentages</h3>
+        <div className="metrics-grid">
+          <MetricCard
+            title="TEXT ONLY %"
+            subtitle="of Total Opt-ins"
+            value={stats.percentages.textOnly}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="EMAIL ONLY %"
+            subtitle="of Total Opt-ins"
+            value={stats.percentages.emailOnly}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="EMAIL & TEXT %"
+            subtitle="of Total Opt-ins"
+            value={stats.percentages.both}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="DX PLATFORMS"
+            subtitle="Dealer Web Dist."
+            value={stats.percentages.dx}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="CX PLATFORMS"
+            subtitle="Consumer Dist."
+            value={stats.percentages.cx}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="FORDPASS ONLY"
+            subtitle="Platform Dist."
+            value={stats.percentages.fp}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="OWNER WEB ONLY"
+            subtitle="Platform Dist."
+            value={stats.percentages.ow}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+          <MetricCard
+            title="TIER3 ONLY"
+            subtitle="Platform Dist."
+            value={stats.percentages.t3}
+            icon={<FaPercentage />}
+            color="#EAE1F9"
+            iconColor="#7D35EF"
+          />
+        </div>
+      </section>
     </div>
   );
 }

@@ -28,7 +28,6 @@ export const parseCsvData = (file: File): Promise<DashboardCounts> => {
 
                     if (source) {
                         let type = "";
-                        // Logic for the 4 combinations
                         if (isText && isEmail) {
                             type = "Email & Text";
                         } else if (isText && !isEmail) {
