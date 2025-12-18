@@ -61,6 +61,7 @@ function App() {
     metrics: true,
     totals: true,
     percentages: true,
+    monthOverMonth: true
   });
 
   const toggleSection = (section: keyof typeof sectionsOpen) => {
@@ -438,6 +439,27 @@ function App() {
           </div>
         )}
       </section>
+
+      <hr className="divider" />
+
+      {/* MONTH OVER MONTH SECTION */}
+      <section className="metrics-section">
+        <div
+          className="section-header-clickable"
+          onClick={() => toggleSection("monthOverMonth")}
+        >
+          <h3 className="section-label">
+            Month Over Month Comparison
+            {sectionsOpen.monthOverMonth ? (
+              <FaChevronDown className="chevron" />
+            ) : (
+              <FaChevronRight className="chevron" />
+            )}
+          </h3>
+        </div>
+      </section>
+
+      
     </div>
   );
 }
