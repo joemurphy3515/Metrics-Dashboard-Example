@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { FaCar } from "react-icons/fa6";
 import { FiDownload } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
+import { GrPowerReset } from "react-icons/gr";
+
+import {
+  parseCsvData,
+  type DashboardCounts,
+} from "./services/CommsReportParser";
 import "./App.css";
 
 interface MetricProps {
   title: string;
-  subtitle: string; // Added for the source details
+  subtitle: string;
   value: string;
   icon: React.ReactNode;
   color: string;
@@ -28,95 +34,99 @@ const MetricCard = ({ title, subtitle, value, icon, color }: MetricProps) => (
 );
 
 function App() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [counts, setCounts] = useState<DashboardCounts>({});
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const result = await parseCsvData(file);
+        setCounts(result);
+      } catch (err) {
+        console.error("Failed to parse CSV", err);
+      }
+    }
+  };
+
+  const handleReset = () => {
+    setCounts({});
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const getVal = (source: string, type: string) => {
+    const key = `${source}-${type}`;
+    return counts[key]?.toLocaleString() || "xxxx";
+  };
+
   const metrics = [
-    // Text Only
     {
       title: "Source - Dealer Web",
       subtitle: "Text Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Dealer Web", "Text Only"),
     },
     {
       title: "Source - FPass",
       subtitle: "Text Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("FPass", "Text Only"),
     },
     {
       title: "Source - Owner Web",
       subtitle: "Text Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Owner Web", "Text Only"),
     },
     {
       title: "Source - Tier3",
       subtitle: "Text Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Tier3", "Text Only"),
     },
 
-    // Email Only
     {
       title: "Source - Dealer Web",
       subtitle: "Email Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Dealer Web", "Email Only"),
     },
     {
       title: "Source - FPass",
       subtitle: "Email Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("FPass", "Email Only"),
     },
     {
       title: "Source - Owner Web",
       subtitle: "Email Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Owner Web", "Email Only"),
     },
     {
       title: "Source - Tier3",
       subtitle: "Email Only",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Tier3", "Email Only"),
     },
 
-    // No Comms
     {
       title: "Source - Dealer Web",
       subtitle: "No Comms",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Dealer Web", "No Comms"),
     },
     {
       title: "Source - FPass",
       subtitle: "No Comms",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("FPass", "No Comms"),
     },
     {
       title: "Source - Owner Web",
       subtitle: "No Comms",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Owner Web", "No Comms"),
     },
     {
       title: "Source - Tier3",
       subtitle: "No Comms",
-      value: "xxxx",
-      icon: <FaCar />,
-      color: "#e5eafbff",
+      value: getVal("Tier3", "No Comms"),
     },
   ];
 
@@ -128,9 +138,20 @@ function App() {
           <h1 className="header-title">Metrics Dashboard</h1>
         </div>
         <div className="header-right">
-          <button className="btn-primary">
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            accept=".csv"
+            onChange={handleFileChange}
+          />
+          <button className="btn-primary" onClick={handleUploadClick}>
             <LuUpload className="btn-icon" />
             Upload
+          </button>
+          <button className="btn-secondary" onClick={handleReset}>
+            <GrPowerReset />
+            Reset
           </button>
           <button className="btn-secondary">
             <FiDownload className="btn-icon" />
@@ -139,7 +160,7 @@ function App() {
         </div>
       </header>
 
-      <hr className='divider'></hr>
+      <hr className="divider" />
 
       <section className="metrics-section">
         <h3 className="section-label">Key Metrics</h3>
@@ -150,8 +171,8 @@ function App() {
               title={m.title}
               subtitle={m.subtitle}
               value={m.value}
-              icon={m.icon}
-              color={m.color}
+              icon={<FaCar />}
+              color="#e5eafbff"
             />
           ))}
         </div>
