@@ -14,7 +14,7 @@ export const parseCsvData = (file: File): Promise<DashboardCounts> => {
 
                 const channelMap: Record<string, string> = {
                     DP: "Dealer Web",
-                    FORDPASS: "FPass",
+                    FORDPASS: "FordPass",
                     OWNERWEB: "Owner Web",
                     TIER3DEALERWEB: "Tier3",
                 };

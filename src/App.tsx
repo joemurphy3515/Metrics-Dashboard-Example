@@ -72,9 +72,9 @@ function App() {
       value: getVal("Dealer Web", "Text Only"),
     },
     {
-      title: "Source - FPass",
+      title: "Source - FordPass",
       subtitle: "Text Only",
-      value: getVal("FPass", "Text Only"),
+      value: getVal("FordPass", "Text Only"),
     },
     {
       title: "Source - Owner Web",
@@ -93,9 +93,9 @@ function App() {
       value: getVal("Dealer Web", "Email Only"),
     },
     {
-      title: "Source - FPass",
+      title: "Source - FordPass",
       subtitle: "Email Only",
-      value: getVal("FPass", "Email Only"),
+      value: getVal("FordPass", "Email Only"),
     },
     {
       title: "Source - Owner Web",
@@ -114,9 +114,9 @@ function App() {
       value: getVal("Dealer Web", "No Comms"),
     },
     {
-      title: "Source - FPass",
+      title: "Source - FordPass",
       subtitle: "No Comms",
-      value: getVal("FPass", "No Comms"),
+      value: getVal("FordPass", "No Comms"),
     },
     {
       title: "Source - Owner Web",
