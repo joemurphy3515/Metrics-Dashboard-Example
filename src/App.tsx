@@ -1,8 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { FaCar } from "react-icons/fa6";
 import { FiDownload } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
 import { GrPowerReset } from "react-icons/gr";
+import { MdCalendarMonth } from "react-icons/md";
 
 import {
   parseCsvData,
@@ -35,11 +36,38 @@ const MetricCard = ({ title, subtitle, value, icon, color }: MetricProps) => (
 
 function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [counts, setCounts] = useState<DashboardCounts>({});
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const months = useMemo(() => {
+    const list = [];
+    const years = [2025, 2026];
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    for (const year of years) {
+      for (const name of monthNames) {
+        list.push(`${name} ${year}`);
+      }
+    }
+    return list;
+  }, []);
+
+  const [allMonthlyData, setAllMonthlyData] = useState<
+    Record<string, DashboardCounts>
+  >({});
+  const [selectedMonth, setSelectedMonth] = useState<string>(months[0]);
+
+  const handleUploadClick = () => fileInputRef.current?.click();
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -48,21 +76,27 @@ function App() {
     if (file) {
       try {
         const result = await parseCsvData(file);
-        setCounts(result);
+        setAllMonthlyData((prev) => ({
+          ...prev,
+          [selectedMonth]: result,
+        }));
+        if (fileInputRef.current) fileInputRef.current.value = "";
       } catch (err) {
         console.error("Failed to parse CSV", err);
       }
     }
   };
 
-  const handleReset = () => {
-    setCounts({});
-    if (fileInputRef.current) fileInputRef.current.value = "";
+  const handleResetAll = () => {
+    if (window.confirm("This will clear data for ALL months. Continue?")) {
+      setAllMonthlyData({});
+    }
   };
 
   const getVal = (source: string, type: string) => {
+    const currentMonthData = allMonthlyData[selectedMonth] || {};
     const key = `${source}-${type}`;
-    return counts[key]?.toLocaleString() || "xxxx";
+    return currentMonthData[key]?.toLocaleString() || "xxxx";
   };
 
   const metrics = [
@@ -86,7 +120,6 @@ function App() {
       subtitle: "Text Only",
       value: getVal("Tier3", "Text Only"),
     },
-
     {
       title: "Source - Dealer Web",
       subtitle: "Email Only",
@@ -107,7 +140,6 @@ function App() {
       subtitle: "Email Only",
       value: getVal("Tier3", "Email Only"),
     },
-
     {
       title: "Source - Dealer Web",
       subtitle: "No Comms",
@@ -136,7 +168,23 @@ function App() {
         <div className="header-left">
           <div className="logo-box">⊞</div>
           <h1 className="header-title">Metrics Dashboard</h1>
+
+          <div className="month-picker-container">
+            <MdCalendarMonth className="picker-icon" />
+            <select
+              className="month-select"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              {months.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
         <div className="header-right">
           <input
             type="file"
@@ -149,9 +197,9 @@ function App() {
             <LuUpload className="btn-icon" />
             Upload
           </button>
-          <button className="btn-secondary" onClick={handleReset}>
-            <GrPowerReset />
-            Reset
+          <button className="btn-secondary" onClick={handleResetAll}>
+            <GrPowerReset className="btn-icon" />
+            Reset All
           </button>
           <button className="btn-secondary">
             <FiDownload className="btn-icon" />
@@ -159,6 +207,15 @@ function App() {
           </button>
         </div>
       </header>
+
+      <div className="view-status">
+        Currently viewing data for: <strong>{selectedMonth}</strong>
+        {allMonthlyData[selectedMonth] ? (
+          <span className="status-badge success">Data Loaded</span>
+        ) : (
+          <span className="status-badge empty">No Data</span>
+        )}
+      </div>
 
       <hr className="divider" />
 
