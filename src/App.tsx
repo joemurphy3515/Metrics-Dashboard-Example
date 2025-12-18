@@ -15,6 +15,7 @@ import { RxValueNone } from "react-icons/rx";
 
 import {
   parseCsvData,
+  exportDashboardData,
   type DashboardCounts,
 } from "./services/CommsReportParser";
 import "./App.css";
@@ -89,7 +90,6 @@ function App() {
   const stats = useMemo(() => {
     const data = allMonthlyData[selectedMonth] || {};
     const sources = ["Dealer Web", "FordPass", "Owner Web", "Tier3"];
-
     const n = (s: string, t: string) => data[`${s}-${t}`] || 0;
 
     const textOnly = sources.reduce((acc, s) => acc + n(s, "Text Only"), 0);
@@ -100,7 +100,6 @@ function App() {
 
     const getPlatformOptIns = (s: string) =>
       n(s, "Text Only") + n(s, "Email Only") + n(s, "Email & Text");
-
     const dxOptIns = getPlatformOptIns("Dealer Web");
     const fpOptIns = getPlatformOptIns("FordPass");
     const owOptIns = getPlatformOptIns("Owner Web");
@@ -108,7 +107,6 @@ function App() {
     const cxOptIns = fpOptIns + owOptIns + t3OptIns;
 
     const hasData = Object.keys(data).length > 0 && totalOptIns > 0;
-
     const fmtPct = (val: number) =>
       hasData ? `${((val / totalOptIns) * 100).toFixed(1)}%` : "xxxx";
 
@@ -160,6 +158,35 @@ function App() {
     return currentData[`${source}-${type}`]?.toLocaleString() || "xxxx";
   };
 
+  const handleExport = () => {
+    if (!allMonthlyData[selectedMonth]) {
+      alert("No data available to export for this month.");
+      return;
+    }
+
+    const metricsForExport: {
+      title: string;
+      subtitle: string;
+      value: string;
+    }[] = [];
+    ["Text Only", "Email Only", "Email & Text", "No Comms"].forEach((type) => {
+      ["Dealer Web", "FordPass", "Owner Web", "Tier3"].forEach((source) => {
+        metricsForExport.push({
+          title: `Source - ${source}`,
+          subtitle: type,
+          value: getVal(source, type),
+        });
+      });
+    });
+
+    exportDashboardData(
+      selectedMonth,
+      metricsForExport,
+      stats.totals,
+      stats.percentages
+    );
+  };
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -195,7 +222,7 @@ function App() {
           <button className="btn-secondary" onClick={handleResetAll}>
             <GrPowerReset className="btn-icon" /> Reset All
           </button>
-          <button className="btn-secondary">
+          <button className="btn-secondary" onClick={handleExport}>
             <FiDownload className="btn-icon" /> Export
           </button>
         </div>
