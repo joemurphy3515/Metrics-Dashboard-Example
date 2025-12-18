@@ -1,8 +1,8 @@
 import Papa from "papaparse";
 
-export interface DashboardCounts {
+export type DashboardCounts = {
     [key: string]: number;
-}
+};
 
 export const parseCsvData = (file: File): Promise<DashboardCounts> => {
     return new Promise((resolve, reject) => {
@@ -28,7 +28,10 @@ export const parseCsvData = (file: File): Promise<DashboardCounts> => {
 
                     if (source) {
                         let type = "";
-                        if (isText && !isEmail) {
+                        // Logic for the 4 combinations
+                        if (isText && isEmail) {
+                            type = "Email & Text";
+                        } else if (isText && !isEmail) {
                             type = "Text Only";
                         } else if (!isText && isEmail) {
                             type = "Email Only";

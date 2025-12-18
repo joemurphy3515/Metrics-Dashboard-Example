@@ -99,68 +99,95 @@ function App() {
     return currentMonthData[key]?.toLocaleString() || "xxxx";
   };
 
-  const metrics = [
-    {
-      title: "Source - Dealer Web",
-      subtitle: "Text Only",
-      value: getVal("Dealer Web", "Text Only"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "Text Only",
-      value: getVal("FordPass", "Text Only"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "Text Only",
-      value: getVal("Owner Web", "Text Only"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "Text Only",
-      value: getVal("Tier3", "Text Only"),
-    },
-    {
-      title: "Source - Dealer Web",
-      subtitle: "Email Only",
-      value: getVal("Dealer Web", "Email Only"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "Email Only",
-      value: getVal("FordPass", "Email Only"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "Email Only",
-      value: getVal("Owner Web", "Email Only"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "Email Only",
-      value: getVal("Tier3", "Email Only"),
-    },
-    {
-      title: "Source - Dealer Web",
-      subtitle: "No Comms",
-      value: getVal("Dealer Web", "No Comms"),
-    },
-    {
-      title: "Source - FordPass",
-      subtitle: "No Comms",
-      value: getVal("FordPass", "No Comms"),
-    },
-    {
-      title: "Source - Owner Web",
-      subtitle: "No Comms",
-      value: getVal("Owner Web", "No Comms"),
-    },
-    {
-      title: "Source - Tier3",
-      subtitle: "No Comms",
-      value: getVal("Tier3", "No Comms"),
-    },
-  ];
+const metrics = [
+  // Text Only
+  {
+    title: "Source - Dealer Web",
+    subtitle: "Text Only",
+    value: getVal("Dealer Web", "Text Only"),
+  },
+  {
+    title: "Source - FordPass",
+    subtitle: "Text Only",
+    value: getVal("FordPass", "Text Only"),
+  },
+  {
+    title: "Source - Owner Web",
+    subtitle: "Text Only",
+    value: getVal("Owner Web", "Text Only"),
+  },
+  {
+    title: "Source - Tier3",
+    subtitle: "Text Only",
+    value: getVal("Tier3", "Text Only"),
+  },
+
+  // Email Only
+  {
+    title: "Source - Dealer Web",
+    subtitle: "Email Only",
+    value: getVal("Dealer Web", "Email Only"),
+  },
+  {
+    title: "Source - FordPass",
+    subtitle: "Email Only",
+    value: getVal("FordPass", "Email Only"),
+  },
+  {
+    title: "Source - Owner Web",
+    subtitle: "Email Only",
+    value: getVal("Owner Web", "Email Only"),
+  },
+  {
+    title: "Source - Tier3",
+    subtitle: "Email Only",
+    value: getVal("Tier3", "Email Only"),
+  },
+
+  // Email & Text (NEW)
+  {
+    title: "Source - Dealer Web",
+    subtitle: "Email & Text",
+    value: getVal("Dealer Web", "Email & Text"),
+  },
+  {
+    title: "Source - FordPass",
+    subtitle: "Email & Text",
+    value: getVal("FordPass", "Email & Text"),
+  },
+  {
+    title: "Source - Owner Web",
+    subtitle: "Email & Text",
+    value: getVal("Owner Web", "Email & Text"),
+  },
+  {
+    title: "Source - Tier3",
+    subtitle: "Email & Text",
+    value: getVal("Tier3", "Email & Text"),
+  },
+
+  // No Comms
+  {
+    title: "Source - Dealer Web",
+    subtitle: "No Comms",
+    value: getVal("Dealer Web", "No Comms"),
+  },
+  {
+    title: "Source - FordPass",
+    subtitle: "No Comms",
+    value: getVal("FordPass", "No Comms"),
+  },
+  {
+    title: "Source - Owner Web",
+    subtitle: "No Comms",
+    value: getVal("Owner Web", "No Comms"),
+  },
+  {
+    title: "Source - Tier3",
+    subtitle: "No Comms",
+    value: getVal("Tier3", "No Comms"),
+  },
+];
 
   return (
     <div className="dashboard-container">
