@@ -113,7 +113,7 @@ function App() {
 
   const getPercentagesForMonth = (monthName: string) => {
     const data = allMonthlyData[monthName] || {};
-    const sources = ["Dealer Web", "FordPass", "Owner Web", "Tier3"];
+    const sources = ["Dealer Portal", "FordPass", "Owner Web", "Tier3"];
     const n = (s: string, t: string) => data[`${s}-${t}`] || 0;
 
     const textOnly = sources.reduce((acc, s) => acc + n(s, "Text Only"), 0);
@@ -130,7 +130,7 @@ function App() {
       emailOnly: totalOptIns ? (emailOnly / totalOptIns) * 100 : 0,
       both: totalOptIns ? (both / totalOptIns) * 100 : 0,
       dx: totalOptIns
-        ? (getPlatformOptIns("Dealer Web") / totalOptIns) * 100
+        ? (getPlatformOptIns("Dealer Portal") / totalOptIns) * 100
         : 0,
       cx: totalOptIns
         ? ((getPlatformOptIns("FordPass") +
@@ -178,7 +178,7 @@ function App() {
 
   const stats = useMemo(() => {
     const data = allMonthlyData[selectedMonth] || {};
-    const sources = ["Dealer Web", "FordPass", "Owner Web", "Tier3"];
+    const sources = ["Dealer Portal", "FordPass", "Owner Web", "Tier3"];
     const n = (s: string, t: string) => data[`${s}-${t}`] || 0;
 
     const textOnly = sources.reduce((acc, s) => acc + n(s, "Text Only"), 0);
@@ -189,7 +189,7 @@ function App() {
 
     const getPlatformOptIns = (s: string) =>
       n(s, "Text Only") + n(s, "Email Only") + n(s, "Email & Text");
-    const dxOptIns = getPlatformOptIns("Dealer Web");
+    const dxOptIns = getPlatformOptIns("Dealer Portal");
     const fpOptIns = getPlatformOptIns("FordPass");
     const owOptIns = getPlatformOptIns("Owner Web");
     const t3OptIns = getPlatformOptIns("Tier3");
@@ -259,7 +259,7 @@ function App() {
       value: string;
     }[] = [];
     ["Text Only", "Email Only", "Email & Text", "No Comms"].forEach((type) => {
-      ["Dealer Web", "FordPass", "Owner Web", "Tier3"].forEach((source) => {
+      ["Dealer Portal", "FordPass", "Owner Web", "Tier3"].forEach((source) => {
         metricsForExport.push({
           title: `Source - ${source}`,
           subtitle: type,
@@ -348,7 +348,7 @@ function App() {
           <div className="metrics-grid">
             {["Text Only", "Email Only", "Email & Text", "No Comms"].map(
               (type) =>
-                ["Dealer Web", "FordPass", "Owner Web", "Tier3"].map(
+                ["Dealer Portal", "FordPass", "Owner Web", "Tier3"].map(
                   (source) => (
                     <MetricCard
                       key={`${source}-${type}`}
@@ -476,7 +476,7 @@ function App() {
             />
             <MetricCard
               title="DX PLATFORMS"
-              subtitle="Dealer Web Dist."
+              subtitle="Dealer Portal Dist."
               value={stats.percentages.dx}
               icon={<FaPercentage />}
               color="#EAE1F9"

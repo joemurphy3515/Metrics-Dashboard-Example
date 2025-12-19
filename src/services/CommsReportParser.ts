@@ -9,32 +9,30 @@ export const parseCsvData = (file: File): Promise<DashboardCounts> => {
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
+            transform: (value) => value.trim(),
             complete: (results) => {
                 const counts: DashboardCounts = {};
                 const channelMap: Record<string, string> = {
-                    DP: "Dealer Web",
+                    DP: "Dealer Portal",
                     FORDPASS: "FordPass",
                     OWNERWEB: "Owner Web",
                     TIER3DEALERWEB: "Tier3",
                 };
 
                 results.data.forEach((row: any) => {
-                    const rawChannel = row["ChannelType"];
-                    const source = channelMap[rawChannel];
+                    const source = channelMap[row["ChannelType"]?.toUpperCase()];
                     const isText = String(row["IsTextCommunication"]).toLowerCase() === "true";
                     const isEmail = String(row["IsEmailCommunication"]).toLowerCase() === "true";
 
                     if (source) {
-                        let type = "";
-                        if (isText && isEmail) type = "Email & Text";
-                        else if (isText && !isEmail) type = "Text Only";
-                        else if (!isText && isEmail) type = "Email Only";
-                        else if (!isText && !isEmail) type = "No Comms";
+                        let type = "No Comms";
 
-                        if (type) {
-                            const key = `${source}-${type}`;
-                            counts[key] = (counts[key] || 0) + 1;
-                        }
+                        if (isText && isEmail) type = "Email & Text";
+                        else if (isText) type = "Text Only";
+                        else if (isEmail) type = "Email Only";
+
+                        const key = `${source}-${type}`;
+                        counts[key] = (counts[key] || 0) + 1;
                     }
                 });
                 resolve(counts);
