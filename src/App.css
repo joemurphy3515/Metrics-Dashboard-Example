@@ -232,12 +232,6 @@
   align-self: center;
 }
 
-.mom-controls {
-  background: #f8fafc;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px dashed #cbd5e1;
-}
 
 .compare-inputs {
   display: flex;
